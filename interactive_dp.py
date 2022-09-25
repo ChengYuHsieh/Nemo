@@ -220,7 +220,7 @@ if __name__ == '__main__':
     parser.add_argument('--label-model', type=str, default='mv')
     # query method settings
     parser.add_argument('--query-method', type=str, default='uncertainty_lm')
-    parser.add_argument('--qei', action='store_true')
+    parser.add_argument('--seu', action='store_true')
     parser.add_argument('--lexicon', type=int, default=None)
     parser.add_argument('--pn', action='store_true')
     parser.add_argument('--kw', action='store_true')
