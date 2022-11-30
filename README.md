@@ -1,5 +1,7 @@
 # Nemo
 Guiding and Contextualizing Weak Supervision for Interactive Data Programming
+- More examples and instructions coming soon!
+
 
 ## Environment Setup
 `pip install -r requirements.txt`
