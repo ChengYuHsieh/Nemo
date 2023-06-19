@@ -15,8 +15,6 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from implyloss import ImplyLoss
-from kliep import DensityRatioEstimator
-import pdb
 
 
 def run_fs(args, train_dataset, valid_dataset, warmup_dataset, test_dataset):
@@ -70,11 +68,6 @@ def train_disc_model(args, xs_tr, ys_tr_soft, ys_tr_hard, xs_tr_unlabeled, valid
     seed = np.random.randint(1e6)
     disc_model = get_discriminator(model_type=args.model_type, prob_labels=args.soft_training, seed=seed)
 
-    if args.dist_shift == 'kliep':        
-        kliep = DensityRatioEstimator()
-        kliep.fit(xs_tr, valid_dataset.xs_feature)
-        weights = kliep.predict(xs_tr)
-        ys_tr_soft = (ys_tr_soft.T * weights).T
 
     if args.soft_training:
         ys_tr = ys_tr_soft[:, 1]
@@ -198,8 +191,8 @@ def eval_disc_model(t, disc_model, test_dataset, history):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Interactive Data Programming')
     # paths
-    parser.add_argument('--root_dir', type=str, default='../')
-    parser.add_argument('--save_dir', type=str, default='vldb_results')
+    parser.add_argument('--root_dir', type=str, default='..')
+    parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--data_dir', type=str, default="data")
     # dataset settings
     parser.add_argument('--dataset', type=str, default='AmazonReview')
@@ -228,7 +221,6 @@ if __name__ == '__main__':
     parser.add_argument('--aggregate', type=str, default=None)
     # learning method settings
     parser.add_argument('--soft-training', action='store_true')
-    parser.add_argument('--dist-shift', type=str, default=None)
     parser.add_argument('--discard', type=str, default=None)
     # experiment settings
     parser.add_argument('--seed', type=int, default=0)
@@ -274,15 +266,15 @@ if __name__ == '__main__':
         np.random.seed(run)
         rand_state = np.random.RandomState(run)
 
-        # init LF model (used only in QEU)
-        if args.qei:
+        # init LF model (used only in SEU)
+        if args.seu:
             lf_model = LFModel(train_dataset.xs_token, sentiment_lexicon, pn=args.pn, kw=args.kw, dict_size=args.lexicon)
         else:
             lf_model = None
 
         # init query agent
         query_agent = QueryAgent(train_dataset.xs_feature, train_dataset.xs_token,
-                                 args.query_method, args.query_size, rand_state, False, args.qei, args.aggregate)
+                                 args.query_method, args.query_size, rand_state, False, args.seu, args.aggregate)
 
         # init lf agent
         lf_agent = LFAgent(train_dataset, valid_dataset, sentiment_lexicon, method=args.lf_method, rand_state=rand_state,
@@ -362,11 +354,11 @@ if __name__ == '__main__':
                 history['train_precision'].append(precision_tr)
                 history['train_coverage'].append(coverage_tr)
 
-                if args.qei:
+                if args.seu:
                     lf_model.update(lf.keyword)                
             else:
                 print('No LF returned')
-                if args.qei:
+                if args.seu:
                     keywords_rm = train_dataset.xs_token[cur_query_idxs[0]]
                     lf_model.update_none(keywords_rm)
 
@@ -374,8 +366,8 @@ if __name__ == '__main__':
         save_path = f'./feature_{args.feature}_warmup_{args.warmup_ratio}_val_{args.valid_ratio}_lf_{args.lf_acc}_simulate_{args.lf_simulate}'\
                     f'/{args.dataset}/{args.model_type}/{args.lf_method}'\
                     f'/{args.label_model}_{args.soft_training}'\
-                    f'/{args.query_method}_{args.qei}_{args.use_ys_pred}_{args.aggregate}_{args.pn}'\
-                    f'_{args.kw}_{args.lexicon}_{args.discard}_{args.dist_shift}/{run}'
+                    f'/{args.query_method}_{args.seu}_{args.use_ys_pred}_{args.aggregate}_{args.pn}'\
+                    f'_{args.kw}_{args.lexicon}_{args.discard}/{run}'
 
         save_path = os.path.join(save_dir, save_path)
 

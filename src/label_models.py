@@ -1,6 +1,5 @@
 from collections import defaultdict
 import numpy as np
-from scipy import sparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,9 +8,7 @@ from torch.utils.data import DataLoader
 from copy import deepcopy
 
 from snorkel.labeling.model import LabelModel as SnorkelLM
-from generative_models.labelmodels import NaiveBayes
 
-import pdb
 import optuna
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 from sklearn.preprocessing import KBinsDiscretizer
