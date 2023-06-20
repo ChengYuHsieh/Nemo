@@ -13,13 +13,28 @@ pip uninstall -y nvidia_cublas_cu11
 
 ## Download Data
 ```
-gdown 15Ip806UasUCeaVcZXtXg2mFLzgObUvTi
+gdown 1C48r6FCw-hU6ACbO9BMIgdtHkJn6AMB2
 unzip nemo_data.zip && rm nemo_data.zip
 ```
 
-## Command Usages
-- Random selection: `python interactive_dp.py --dataset AmazonReview --query-method random`
-- SEU selection: `python interactive_dp.py --dataset AmazonReview --query-method uncertainty_lm --seu`
+## Example Command Usages
+Under directory `src/`:
+- Snorkel (select by random):
+  ```
+  python interactive_dp.py  --dataset AmazonReview  --label-model snorkel --soft-training --query-method random
+  ```
+- Snorkel-Abs (select by abstain):
+  ```
+  python interactive_dp.py  --dataset AmazonReview  --label-model snorkel --soft-training --query-method abstain
+  ```
+- Snorkel-Dis (select by disagreement):
+  ```
+  python interactive_dp.py  --dataset AmazonReview  --label-model snorkel --soft-training --query-method disagreement
+  ```
+- Nemo:
+  ```
+  python interactive_dp.py  --dataset AmazonReview  --label-model snorkel --soft-training --query-method uncertainty_lm --seu --aggregate weighted --discard grid
+  ```
 
 
 ## Cite
